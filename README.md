@@ -141,13 +141,13 @@
 <div>
     <img src="https://user-images.githubusercontent.com/54920378/99698153-c9615f80-2ad3-11eb-806d-4d9246415963.PNG" width="220">
     <img src="https://user-images.githubusercontent.com/54920378/99696819-75a24680-2ad2-11eb-9727-14f25ac02c69.PNG" width="230">
-    <img src="https://user-images.githubusercontent.com/54920378/99696820-75a24680-2ad2-11eb-8029-60862e0b1e55.PNG" width="230">
-    <img src="https://user-images.githubusercontent.com/54920378/99696821-763add00-2ad2-11eb-9072-d85f17fd17d7.PNG" width="235">
+    <img src="https://user-images.githubusercontent.com/54920378/99696820-75a24680-2ad2-11eb-8029-60862e0b1e55.PNG" width="235">
+    <img src="https://user-images.githubusercontent.com/54920378/99696821-763add00-2ad2-11eb-9072-d85f17fd17d7.PNG" width="232">
 </div>
 
 **사용자의 경우**
 <div>
-    <img src="https://user-images.githubusercontent.com/54920378/99697853-74254e00-2ad3-11eb-8058-9862849a4b5b.PNG" width="265">
+    <img src="https://user-images.githubusercontent.com/54920378/99697853-74254e00-2ad3-11eb-8058-9862849a4b5b.PNG" width="255">
     <img src="https://user-images.githubusercontent.com/54920378/99697851-738cb780-2ad3-11eb-9c42-8788fb7b5d34.PNG" width="230">
 </div>
 
