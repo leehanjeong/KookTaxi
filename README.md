@@ -168,128 +168,67 @@ String[] REQUIRED_PERMISSIONS  = { Manifest.permission.ACCESS_FINE_LOCATION, Man
 private String station[] = {"길음역","광화문역","동역사역","홍대입구역"};
 ~~~
 * 구글맵이 사용될 준비가 되었을 때(GoogleMap 객체를 파라미터로 제공할 수 있을 때) 자동으로 호출되는 메소드
-<details markdown="1">
-<summary>접기/펼치기</summary>
-
 ~~~java
 public void onMapReady(final GoogleMap googleMap) {  //map이 사용할 준비가 되었을 때(GoogleMap 객체를 파라미터로 제공할 수 있을 때) 호출되는 메소드
     mMap = googleMap;
     setDefaultLocation();  //초기위치 국민대로 이동
-
-    // 위치 퍼미션을 가지고 있는지 확인
-    int hasFineLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-    int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-
-    if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {  //퍼미션을 가지고 있으면
-        startLocationUpdates();  //위치 업데이트 시작
-    } else {  //퍼미션 요청을 허용한 적 없다면
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {  //사용자가 퍼미션을 거부한 적 있는 경우에는
-            Snackbar.make(mLayout, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {  //snackbar(이유를 보여주고, 사용자가 확인을 클릭을 해야 사라짐)로 허용을 요청함. 요청 결과는 onRequestPermissionResult에서 수신.
-                @Override
-                public void onClick(View view) {
-                    ActivityCompat.requestPermissions( MainActivity.this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
-                }
-            }).show();
-        } else {  //사용자가 퍼미션 거부를 한 적 없으면
-            ActivityCompat.requestPermissions( this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);  //바로 퍼미션 요청을 함
-        }
-    }
-    mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
-    //좌표 객체 생성(우선 4개의 역 좌표 객체를 생성함)
-    LatLng Gwanghwamun = new LatLng(37.5707456,126.973708); //(위도, 경도)
-    LatLng Hongdae = new LatLng(37.557527,126.9222782);
-    LatLng Gileum = new LatLng(37.6086541,127.0136683);
-    LatLng DDP = new LatLng(37.5644,127.0055713);
-
-    MarkerOptions[] markerOptions = new MarkerOptions[4];  //마커옵션 배열 생성. 각 마커의 위치와 타이틀을 설정해줌.
-    markerOptions[0] = new MarkerOptions()
-            .position(Gwanghwamun)
-            .title("광화문역");
-    markerOptions[1] = new MarkerOptions()
-            .position(Hongdae)
-            .title("홍대입구역");
-    markerOptions[2] = new MarkerOptions()
-            .position(Gileum)
-            .title("길음역");
-    markerOptions[3] = new MarkerOptions()
-            .position(DDP)
-            .title("동역사역");
-
-    for(int i=0; i<4; i++){
-        mMap.addMarker(markerOptions[i]); //addMarker()를 통해 GoogleMap객체(mMap)에 추가하면 지도에 표시된다.
-    }
-
-    mMap.setOnMarkerClickListener(this); //마커 클릭 리스너
-}
-~~~
-
-</details>
-
-
-
-
-- GoogleMap을 실행하기 위해 필요한 permission들을 String 배열에 정의
-~~~java
-String[] REQUIRED_PERMISSIONS  = { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION };
-~~~
-- GoogleMap 객체를 파라미터로 제공할 수 있을 때(사용할 준비가 되었을 때) onMapReady() 메소드 호출
-~~~java
-SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-mapFragment.getMapAsync(this);
-...
-@Override
-public void onMapReady(final GoogleMap googleMap) {
-    mMap = googleMap;
-    setDefaultLocation();  //초기위치 서울로 이동
-
-    // 위치 퍼미션을 가지고 있는지 확인
-    int hasFineLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-    int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-
-    if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
-        startLocationUpdates();
-    } else {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
-            Snackbar.make(mLayout, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ActivityCompat.requestPermissions( MainActivity.this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
-                }
-            }).show();
-        } else {
-            ActivityCompat.requestPermissions( this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
-        }
-    }
-    mMap.getUiSettings().setMyLocationButtonEnabled(true);
     ...
+~~~
+* 위치 퍼미션을 가지고 있는지 확인
+~~~java
+int hasFineLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {  //퍼미션을 가지고 있으면
+    startLocationUpdates();  //위치 업데이트 시작
+} else {  //퍼미션 요청을 허용한 적 없다면
+    if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {  //사용자가 퍼미션을 거부한 적 있는 경우에는
+        Snackbar.make(mLayout, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {  //snackbar(이유를 보여주고, 사용자가 확인을 클릭을 해야 사라짐)로 허용을 요청함. 요청 결과는 onRequestPermissionResult에서 수신.
+            @Override
+            public void onClick(View view) {
+                ActivityCompat.requestPermissions( MainActivity.this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
+            }
+        }).show();
+    } else {  //사용자가 퍼미션 거부를 한 적 없으면
+        ActivityCompat.requestPermissions( this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);  //바로 퍼미션 요청을 함
+    }
 }
 ~~~
-- 4개의 지하철역 좌표 객체 생성 후 마커 추가
+* 좌표 객체(주요 4개 역)를 생성한다. 추후에는 더 많은 좌표로 늘릴 수 있다.
+    * 구글맵을 통해 각 역의 (위도, 경도)를 받아왔으나, 약간의 오차는 발생한다.
 ~~~java
 LatLng Gwanghwamun = new LatLng(37.5707456,126.973708); //(위도, 경도)
 LatLng Hongdae = new LatLng(37.557527,126.9222782);
 LatLng Gileum = new LatLng(37.6086541,127.0136683);
 LatLng DDP = new LatLng(37.5644,127.0055713);
-
-MarkerOptions[] markerOptions = new MarkerOptions[4];
+~~~
+* 좌표 객체를 position으로, 위치를 title로 하는 markerOptions 객체 4개를 만든 후 배열에 넣는다. 
+~~~java
+MarkerOptions[] markerOptions = new MarkerOptions[4];  //마커옵션 배열 생성. 각 마커의 위치와 타이틀을 설정해줌.
 markerOptions[0] = new MarkerOptions()
-        .position(Gwanghwamun)
-        .title("광화문역");
+    .position(Gwanghwamun)
+    .title("광화문역");
 markerOptions[1] = new MarkerOptions()
-        .position(Hongdae)
-        .title("홍대입구역");
+    .position(Hongdae)
+    .title("홍대입구역");
 markerOptions[2] = new MarkerOptions()
-        .position(Gileum)
-        .title("길음역");
+    .position(Gileum)
+    .title("길음역");
 markerOptions[3] = new MarkerOptions()
-        .position(DDP)
-        .title("동대문역사문화공원역");
-
+    .position(DDP)
+    .title("동역사역");
 for(int i=0; i<4; i++){
-    mMap.addMarker(markerOptions[i]);
+    mMap.addMarker(markerOptions[i]); //addMarker()를 통해 GoogleMap객체(mMap)에 추가하면 지도에 표시된다.
 }
 ~~~
+
+
+
+
+
+
+
+
 - 위치 정보 제공이 허용되어 있지 않은 경우 default 위치(국민대 부근, (37.6119, 126.9955)) 보여주는 setDefaultLocation() 메소드 호출
 ~~~java
 public void setDefaultLocation() {
