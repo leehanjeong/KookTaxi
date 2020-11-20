@@ -50,10 +50,6 @@
     * **menu1.xml**
     * **menu_toolbar.xml**
 ---
-### 팀 내 역할
-- 프로젝트를 기획하여 팀장 역할을 맡음
-- MainActivity, ChatActivity(옵션 메뉴), activity_main.xml, activity_chat.xml, menu1.xml를 담당함
----
 ### 실행 화면
 <div>
     <img src="https://user-images.githubusercontent.com/55418359/99452281-b1200200-2966-11eb-96ea-0192e7beb21c.jpg" width="200">
