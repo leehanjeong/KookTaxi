@@ -101,6 +101,7 @@
   * 기본 레이아웃은 LinearLayout
   * 채팅이 표시되는 부분은 ListView로 구현
   * 각종 View들을 이용하여 필요한 레이아웃 생성
+  * 내가 사용하는 AVD화면에 알맞게 View들을 배치했다가 다른 조원들의 화면에서 버튼이 화면밖으로 나가는 등의 경우가 발생하여 우선 두개의 버튼을 동일한 위치에 두기 위해 gravity = right로 설정하여 오른쪽으로 정렬한 후, 옆의 CheckedTextView는 버튼으로부터의 margin을 통해 배치하였다.
 <div>
   <img src="https://user-images.githubusercontent.com/54920378/99692850-18a49180-2ace-11eb-8bdb-16f5ce5c67b1.PNG" width="415">
   <img src="https://user-images.githubusercontent.com/54920378/99692854-193d2800-2ace-11eb-9be3-e2d1c2a3cac1.PNG" width="200">
@@ -132,7 +133,7 @@
 
 * menu1.xml
   * menu - item 구조로 옵션 메뉴를 생성
-  * group의 checkableBehavior를 이용하여 체크 기능을 이용하려 하였으나, 체크가 되지 않아(이유를 찾지 못함) 이용하지 못함. 아직 강퇴하기 메뉴에는 남아있음. 
+  * group의 checkableBehavior를 이용하여 체크 기능을 이용하려 하였으나, 체크가 되지 않아(이유를 찾지 못함) 이용하지 못함. 아직 강퇴하기 메뉴에는 남아있음. 대신에 activity_chat.xml에 CheckedTextView를 이용함.
 <div>
     <img src="https://user-images.githubusercontent.com/54920378/99696826-776c0a00-2ad2-11eb-96a4-4392bdee931c.PNG" width="230">
 </div>
@@ -221,50 +222,110 @@ for(int i=0; i<4; i++){
     mMap.addMarker(markerOptions[i]); //addMarker()를 통해 GoogleMap객체(mMap)에 추가하면 지도에 표시된다.
 }
 ~~~
-
-
-
-
-
-
-
-
-- 위치 정보 제공이 허용되어 있지 않은 경우 default 위치(국민대 부근, (37.6119, 126.9955)) 보여주는 setDefaultLocation() 메소드 호출
+* 최근 위치를 받아오는 함수
+    * locationList에 Location을 받아서 계속해서 넣고 (locationList.size()-1) 번째 Location객체(가장 최근 Location)를 location으로 설정한다.
+    * 현재 경도 위도를 담고 있는 Lating을 currentPosition이라고 한다
+    * 이 위치를 setCurrentLocation()의 인자로 보내는데 AVD를 이용할 경우 GPS가 잡히지 않아 초기 위치가 미국으로 잡힌다. 따라서 AVD에서 이 어플을 이용하기 위해서는 setCurrentLocation(location, markerTitle, markerSnippet);를 주석처리한 후 밑의 국민대로 설정한 DEFAULT_LOCATION을 이용하여 카메라를 움직인다.
 ~~~java
-public void setDefaultLocation() {
-    LatLng DEFAULT_LOCATION = new LatLng(37.6119, 126.9955);
-    String markerTitle = "위치정보 가져올 수 없음";
-    String markerSnippet = "위치 퍼미션과 GPS 활성 요부 확인하세요";
+LocationCallback locationCallback = new LocationCallback() {
+    @Override
+    public void onLocationResult(LocationResult locationResult) {
 
-    if (currentMarker != null) currentMarker.remove();
+        super.onLocationResult(locationResult);
+        List<Location> locationList = locationResult.getLocations();
+        if (locationList.size() > 0) {
+            location = locationList.get(locationList.size() - 1);
+            currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
+            String markerTitle = getCurrentAddress(currentPosition);
+            String markerSnippet = "위도:" + String.valueOf(location.getLatitude()) + " 경도:" + String.valueOf(location.getLongitude());
+            //setCurrentLocation(location, markerTitle, markerSnippet);
+            mCurrentLocatiion = location;
+        }
+    }
+};
+~~~
+* 현재 주소를 받아오는 함수. 지오코더 클래스를 이용하여 위도와 경도로부터 주소를 알아냄.
+~~~java
+public String getCurrentAddress(LatLng latlng) {
+    Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+    List<Address> addresses;
 
-    MarkerOptions markerOptions = new MarkerOptions();
-    markerOptions.position(DEFAULT_LOCATION);
+    try {
+        addresses = geocoder.getFromLocation(latlng.latitude, latlng.longitude,1);
+    } catch (IOException ioException) {
+        Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
+        return "지오코더 서비스 사용불가";
+...
+}
+~~~
+* LocationManager를 통해 GPS와 네트워크가 사용 가능한지 체크해주는 함수. 네트워크도 켜져있어야 어플 사용이 가능함
+~~~java
+public boolean checkLocationServicesStatus() { 
+    LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+}
+~~~
+* 현재 위치로 카메라(어플상에 보이는 화면)을 이동시켜주는 함수
+    * AVD에서 이용할 시에는 이 함수를 이용할 수 없고 아래의 setDefaultLocation() 함수를 이용해야함.
+~~~java
+public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
+    if (currentMarker != null) currentMarker.remove(); //마커가 존재하면 마커를 지운다
+    LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude()); //현재 위치
+
+    MarkerOptions markerOptions = new MarkerOptions(); //마커 옵션 설정
+    markerOptions.position(currentLatLng);
     markerOptions.title(markerTitle);
     markerOptions.snippet(markerSnippet);
     markerOptions.draggable(true);
-    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-    currentMarker = mMap.addMarker(markerOptions);
-    
-    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15);
+
+    currentMarker = mMap.addMarker(markerOptions); //해당 마커 추가
+
+    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(currentLatLng); //카메라를 현재 위치로 이동
     mMap.moveCamera(cameraUpdate);
 }
 ~~~
-- 마커 클릭하면 해당 지하철 역의 activity 실행
+* 디폴트 카메라 위치를 설정해주는 함수
+    * 우리의 경우 역 마커들의 대부분 국민대 주변에 있으므로 국민대를 디폴트 카메라 위치로 설정함
+    * newLatingZoom() 함수를 이용하여 카메라의 줌 정도를 설정해봄
 ~~~java
-private String mail;
-private String station[] = {"길음역","광화문역","동역사역","홍대입구역"};
-...
-Intent intent = getIntent();
-mail = intent.getStringExtra("mail");
-...
-@Override
-public void onMapReady(final GoogleMap googleMap) {
-    ...
-    mMap.setOnMarkerClickListener(this);
+public void setDefaultLocation() {  //Default MarkerOptions를 설정해주는 함수(위치정보 제공이 허용되어 있지 않은 경우)
+        LatLng DEFAULT_LOCATION = new LatLng(37.6119, 126.9955);  //첫 위치를 서울(국민대 부근)으로 설정
+        String markerTitle = "위치정보 가져올 수 없음"; //setCurrentLocation과 다르게 인자로 넘어오지 않으므로 직접 설정해줘야함
+        String markerSnippet = "위치 퍼미션과 GPS 활성 요부 확인하세요";
+
+        if (currentMarker != null) currentMarker.remove();
+
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(DEFAULT_LOCATION);
+        markerOptions.title(markerTitle);
+        markerOptions.snippet(markerSnippet);
+        markerOptions.draggable(true);
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        currentMarker = mMap.addMarker(markerOptions);
+
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(DEFAULT_LOCATION, 15);  //두번째 인자(15)는 카메라 줌의 정도를 나타냄
+        mMap.moveCamera(cameraUpdate);
+    }
+~~~
+* 런타임 퍼미션 처리 메소드들 (소스파일에 주석 작성함)
+~~~java
+private boolean checkPermission() {
 }
-...
-@Override
+public void onRequestPermissionsResult(int permsRequestCode, @NonNull String[] permissions, @NonNull int[] grandResults) {
+}
+~~~
+* GPS 활성화를 위한 메소드들 (소스파일에 주석 작성함)
+~~~java
+private void showDialogForLocationServiceSetting() {
+}
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+}
+~~~
+* 마커 클릭 이벤트를 처리하는 함수
+    * 마커를 클릭하면 메일과 역 정보를 담아 intent를 이용하여 SearchActivity로 전달함.
+~~~java
 public boolean onMarkerClick(Marker marker) {
     for (int i=0;i<station.length;i++) {
         if (marker.getTitle().equals(station[i])) {
@@ -277,19 +338,5 @@ public boolean onMarkerClick(Marker marker) {
     return true;
 }
 ~~~
-- 툴바에서 '뒤로가기(←)'를 클릭하였을 때 이전 화면으로 돌아갈 때 intent값 전달 추가 코드 작성(SearchActivity.java, ChatActivity.java)
-~~~java
-tb.setNavigationOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v){
-        Intent intent = new Intent(this, 이동하고 싶은 activity의 class);
-        intent.putExtra("mail", 사용자의 메일);
-        intent.putExtra("station", 선택한 역);
-        startActivity(intent);
-    }
-});
-~~~
-- 채팅방의 대화가 추가되어 ListView가 갱신될 때 하단으로 자동 스크롤
-~~~java
-lv_chating.setTranscriptMode(ListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-~~~
+
+
