@@ -6,7 +6,7 @@
 ### 설명
 
 
-- 목적지가 국민대인 사람들을 모아 택시를 함께 탈 수 있도록 하는 앱입니다.
+- 목적지가 국민대인 사람들을 모아 택시를 함께 탈 수 있도록 하는 앱이다.
 - 동승하고 싶은 사람의 성별 여부, 인원수, 출발 지점(길음역, 광화문역, 홍대입구역, 동대문역사문화공원역) 등에 따라 사람들을 매칭해준다.
 ---
 ### 개발 환경
@@ -31,14 +31,14 @@
 
 ---
 ### 프로젝트 구성
-* **다섯개의 액티비티**
+* **5개의 액티비티**
   * **LoginActivity** - 로그인을 통해 MainActivity로 연결해주고, 회원이 아닐 시 JoinActivity로 연결해주는 액티비티
   * **JoinActivity** - 회원가입을 하는 액티비티
   * **MainActivity** - GPS기반으로 지도를 띄우고 서비스를 제공하는 역의 마커를 표시, 마커를 누르면 해당 역의 SearchActivity로 연결해주는 액티비티
   * **SearchActivity** - 본인이 탑승을 원하는 시간대의 방을 개설하거나 이미 있는 방에 들어가게 해주는 액티비티. ChatActivity로 연결해줌
   * **ChatActivity** - 사용자들끼리 채팅을 나눌 수 있도록 구현, 해당 어플의 원하는 대부분의 기능 동작을 위한 액티비티
 
-* **여덟개의 xml**
+* **8개의 xml**
   * **layout**
     * **activity_login.xml**
     * **activity_join.xml**
@@ -52,15 +52,15 @@
 ---
 ### 팀 내 역할
 - 프로젝트를 기획하여 팀장 역할을 맡음
-- MainActivity, ChatActivity, activity_main.xml, activity_chat.xml, menu1.xml를 담당함
+- MainActivity, ChatActivity(옵션 메뉴), activity_main.xml, activity_chat.xml, menu1.xml를 담당함
 ---
 ### 실행 화면
 <div>
-    <img src="https://user-images.githubusercontent.com/55418359/99452281-b1200200-2966-11eb-96ea-0192e7beb21c.jpg" width="180">
-    <img src="https://user-images.githubusercontent.com/55418359/99452288-b2512f00-2966-11eb-923c-83b82fc37abf.jpg" width="180">
-    <img src="https://user-images.githubusercontent.com/55418359/99452289-b2e9c580-2966-11eb-9136-fec9ec33d89a.jpg" width="180">
-    <img src="https://user-images.githubusercontent.com/55418359/99452292-b3825c00-2966-11eb-9f01-fbe6168c44da.jpg" width="180">
-    <img src="https://user-images.githubusercontent.com/54920378/99683690-f86fd500-2ac3-11eb-87f0-1c796ebb53b8.jpg" width="180">
+    <img src="https://user-images.githubusercontent.com/55418359/99452281-b1200200-2966-11eb-96ea-0192e7beb21c.jpg" width="200">
+    <img src="https://user-images.githubusercontent.com/55418359/99452288-b2512f00-2966-11eb-923c-83b82fc37abf.jpg" width="200">
+    <img src="https://user-images.githubusercontent.com/55418359/99452289-b2e9c580-2966-11eb-9136-fec9ec33d89a.jpg" width="200">
+    <img src="https://user-images.githubusercontent.com/55418359/99452292-b3825c00-2966-11eb-9f01-fbe6168c44da.jpg" width="200">
+    <img src="https://user-images.githubusercontent.com/54920378/99683690-f86fd500-2ac3-11eb-87f0-1c796ebb53b8.jpg" width="200">
 </div>
 
 ---
@@ -269,6 +269,7 @@ public boolean checkLocationServicesStatus() {
 ~~~
 * 현재 위치로 카메라(어플상에 보이는 화면)을 이동시켜주는 함수
     * AVD에서 이용할 시에는 이 함수를 이용할 수 없고 아래의 setDefaultLocation() 함수를 이용해야함.
+    * 마커를 누르면 마커의 옵션을 보여주지만, 현재는 마커 클릭시 바로 다음 액티비티로 넘어가서 볼 수 없음
 ~~~java
 public void setCurrentLocation(Location location, String markerTitle, String markerSnippet) {
     if (currentMarker != null) currentMarker.remove(); //마커가 존재하면 마커를 지운다
@@ -340,7 +341,7 @@ public boolean onMarkerClick(Marker marker) {
 ~~~
 
 #### ChatActivity.java (옵션 메뉴 담당)
-* 액티비티가 시작될 때 호출되는 함수. 단 한 번만 호출되기 때문에 MenuItem 생성과 초기화를 모두 이 함수에서 해야함. MenuInflater를 통해 메뉴.xml에 정의돈 메뉴를 파싱하여 Menu 객체를 생성함. 
+* 액티비티가 시작될 때 호출되는 함수. 단 한 번만 호출되기 때문에 MenuItem 생성과 초기화를 모두 이 함수에서 해야함. MenuInflater를 통해 메뉴.xml에 정의된 메뉴를 파싱하여 Menu 객체를 생성함. 
     * menu1.xml에서 옵션메뉴를 처음 누르면 방장/사용자로 구분되는데 이를 각자 방장에게만, 사용자에게만 보이게 하기 위해 데이터베이스의 이메일 값을 이용하여 VISIBLE/INVISIBLE을 설정해주었다.
 ~~~java
 @Override
