@@ -340,10 +340,9 @@ public boolean onMarkerClick(Marker marker) {
 ~~~
 
 #### ChatActivity.java (옵션 메뉴 담당)
-
-~~~java
 * 액티비티가 시작될 때 호출되는 함수. 단 한 번만 호출되기 때문에 MenuItem 생성과 초기화를 모두 이 함수에서 해야함. MenuInflater를 통해 메뉴.xml에 정의돈 메뉴를 파싱하여 Menu 객체를 생성함. 
     * menu1.xml에서 옵션메뉴를 처음 누르면 방장/사용자로 구분되는데 이를 각자 방장에게만, 사용자에게만 보이게 하기 위해 데이터베이스의 이메일 값을 이용하여 VISIBLE/INVISIBLE을 설정해주었다.
+~~~java
 @Override
 public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
