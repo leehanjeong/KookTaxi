@@ -339,4 +339,78 @@ public boolean onMarkerClick(Marker marker) {
 }
 ~~~
 
+#### ChatActivity.java (옵션 메뉴 담당)
+
+~~~java
+* 액티비티가 시작될 때 호출되는 함수. 단 한 번만 호출되기 때문에 MenuItem 생성과 초기화를 모두 이 함수에서 해야함. MenuInflater를 통해 메뉴.xml에 정의돈 메뉴를 파싱하여 Menu 객체를 생성함. 
+    * menu1.xml에서 옵션메뉴를 처음 누르면 방장/사용자로 구분되는데 이를 각자 방장에게만, 사용자에게만 보이게 하기 위해 데이터베이스의 이메일 값을 이용하여 VISIBLE/INVISIBLE을 설정해주었다.
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+    super.onCreateOptionsMenu(menu);
+    getMenuInflater().inflate(R.menu.menu1, menu);
+    getMenuInflater().inflate(R.menu.menu_toolbar, menu);
+
+    MenuItem item_master = menu.findItem(R.id.item_master);
+    MenuItem item_user = menu.findItem(R.id.item_user);
+
+    if (str_user_mail.equals(master_mail)) {
+        item_master.setVisible(true);
+        item_user.setVisible(false);
+    }
+    else {
+        item_master.setVisible(false);
+        item_user.setVisible(true);
+
+        check_text1.setVisibility(View.INVISIBLE);
+        check_text2.setVisibility(View.INVISIBLE);
+        check_text3.setVisibility(View.INVISIBLE);
+    }
+
+    return true;
+}
+~~~
+* 옵션 메뉴의 아이템들이 눌렸을 때의 이벤트를 switch문으로 설정하는 함수(가장 아쉬움이 남는 부분)
+    * 원래의 목적
+        * 매칭 완료 아이템을 누르면 사용자들을 채팅방에서 나가지 못하도록 함(OUT 버튼이 사라짐,데이터 베이스에 데이터 남겨놓음) & activity_search.xml에서 매칭완료된 채팅방은 invisivle하게 만듦.
+        * 입금 확인 메뉴에서 입금한 사용자 아이템을 누르면(현재는 사용자1,2,3으로 구현되어 있지만 데이터베이스에서 id값이나 email값을 받아와서 들어온 순서대로 item의 title을 설정하고 싶음) 해당 사용자의 CheckedTextView에 체크가 되고 그 사용자는 OUT 버튼이 다시 생겨서 나갈 수 있음. 또한 해당 사용자의 정보를 데이터베이스에서 삭제함
+        * 강퇴하기 메뉴에서 특정 사용자 아이템을 누르면 그 사용자는 이 액티비티에서 나가짐
+        * 사용자 메뉴의 입금하기 아이템을 누르면 송금할 수 있도록 방법을 찾음
+        * 방 인원을 최대 4명으로 하고 현재 몇명이 채팅방에 있는지 activity_search.xml의 채팅방 이름에 보이게 함
+    * 위의 대부분의 경우 소켓프로그래밍을 이용해야하는데 이 부분을 모른채 왜 방장에게만 버튼이 없어지는지를 오래 고민함. 
+    * 현재는 방장에게만 OUT버튼이 INVISIVLE 되도록 코드가 작성되어 있음.
+~~~java
+@Override
+public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    switch(item.getItemId()) {
+        case R.id.item_matched:
+            int num = Integer.parseInt(user_cnt);
+            if(num == 4){
+                btn_out.setVisibility(View.INVISIBLE);
+            }
+            matched = true;
+            return true;
+        case R.id.item_user1:
+            confirm_cnt++;
+            check_text1.setChecked(true);
+            return true;
+...
+        // 강퇴하기
+        case R.id.item_user_1:
+            int user_idx = Arrays.asList(user_list).indexOf(str_user_mail);
+            if (user_idx == 1) {
+                user_list[user_idx] = "";
+                cnt_user--;
+
+                Intent intent = new Intent(ChatActivity.this, SearchActivity.class);
+                intent.putExtra("mail", str_user_mail);
+                intent.putExtra("station", station);
+                startActivity(intent);
+            }
+            return true;
+...
+    }
+    return true;
+}
+
+~~~
 
